@@ -1,0 +1,90 @@
+# Use open-source version of Mamba
+_name_: caduceus_lm
+config:
+  _target_: caduceus.configuration_caduceus.CaduceusConfig
+  # From original MambaConfig
+  d_model: 128
+  d_intermediate: 256   #选择是否在块中添加mlp层
+  # Module-based configuration
+  n_modules: 1          #模块数量，每个模块包含8层
+  layers_per_module: 8  #每个模块的层数
+  conv_layers_per_module: 5  #每个模块中前几层使用卷积
+  attn_layer_in_module: 4    #模块内注意力层的位置（0-indexed）
+  attn_layer_idx: null  # 注意力层在模块内的索引列表，如果为null则使用attn_layer_in_module
+  dilation_base: 4    #膨胀系数的初始值
+  dropout: 0.0
+  # Backward compatibility - will be calculated based on modules
+  n_layer: 8            #总层数，将根据 n_modules * layers_per_module 计算
+  vocab_size: 12
+  ssm_cfg:
+    d_state: 16
+    d_conv: 4
+    # conv_init: null   #卷积层初始化的范围。/mamba2参数
+    expand: 2
+    # headdim: 32       #mamba2参数
+    # d_ssm: null     #这个参数控制模型中的 SSM 组件的维度。如果没有设置（None），则会用 d_inner 作为替代。
+    # ngroups: 1      #如果多设备计算，每个设备处理的组数？/mamba2参数
+    # process_group: null  #参与分布式训练的进程集合/mamba2参数
+    # A_init_range: [1, 16]   #A 矩阵的初始化范围/mamba2参数
+    # D_has_hdim: False     #指示 D 是否具有头维度/mamba2参数
+    dt_rank: "auto"   #mamba1参数
+    dt_min: 0.001
+    dt_max: 0.1
+    dt_init: "random"  #mamba1参数
+    dt_scale: 1.0   #mamba1参数
+    dt_init_floor: 1e-4
+    conv_bias: True
+    bias: false
+    use_fast_path: true  #mamba1参数
+  attn_cfg: 
+    num_heads: 16
+    head_dim: null  # If None, use embed_dim // num_heads
+    mlp_dim: 256   #MLP（多层感知机）的维度
+    qkv_proj_bias: false    #这些参数控制是否在 QKV 投影和输出投影中使用偏置项。
+    out_proj_bias: True    #这些参数控制是否在 QKV 投影和输出投影中使用偏置项。
+    softmax_scale: null    #在计算注意力权重时，是否对其进行缩放
+    dropout: 0.0   #注意力机制的 dropout 率
+    # window_size:   #如果不为 None，则使用局部注意力机制。
+    use_moh: false   #如果为 True，则使用混合头注意力机制。
+    deterministic: false    #如果为 True，则使用确定性注意力机制。
+    use_flash_attn: false    #如果为 True，则使用 Flash 注意力机制。
+    use_alibi: False   #如果为 True，则使用线性偏置。
+    causal: False    #是否使用因果卷积（通常用于自回归模型）。
+    d_conv: 3    #卷积核的大小
+    rotary_emb_dim: 0    #旋转位置编码的维度，如果为 0，则不使用旋转位置编码。
+    rotary_emb_base: 10000.0   #旋转位置编码的基数。
+    rotary_emb_interleaved: False    #是否交错使用旋转位置编码。
+
+  # Fourier Position Embedding 参数
+  use_fourier_pos_emb: true    #是否使用傅里叶位置编码，如果为false则使用旋转位置编码
+  fourier_max_seq_len: 32768   #傅里叶位置编码的最大序列长度
+  fourier_dim: null            #傅里叶位置编码的维度，如果为null则使用d_model
+  fourier_init: "eye_xavier_norm"  #傅里叶系数的初始化方法
+  fourier_init_norm_gain: 0.3     #傅里叶初始化的增益
+  fourier_separate_basis: true    #是否使用分离的sin/cos基
+  fourier_separate_head: true     #是否为每个注意力头使用分离的系数
+  fourier_learnable: false        #傅里叶系数是否可学习
+  fourier_norm: false             #是否对傅里叶系数进行归一化
+  fourier_ignore_zero: true       #是否忽略零频率
+
+  rms_norm: true
+  fused_add_norm: true
+  residual_in_fp32: True
+  pad_vocab_size_multiple: 8
+  # Not in original MambaConfig, but default arg in create_block in mamba_ssm repo; used in layer norm
+  norm_epsilon: 1e-5
+
+  # Used in init_weights
+  initializer_cfg:
+    initializer_range: 0.02
+    rescale_prenorm_residual: true
+    n_residuals_per_layer: 1
+
+  # Caduceus-specific params
+  bidirectional: true
+  bidirectional_strategy: "add"
+  bidirectional_weight_tie: true
+  rcps: false
+
+  # Used for RCPSEmbedding / RCPSLMHead (will be filled in during model instantiation using info from tokenizer)
+  complement_map: null

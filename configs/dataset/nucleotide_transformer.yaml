@@ -1,0 +1,183 @@
+_name_: nucleotide_transformer  # this links to the overall SequenceDataset of all nucleotide transformer datasets
+train_val_split_seed: ${train.seed}  # Used for train/validation splitting
+dataset_name: enhancers  # this specifies which dataset in nuc trx
+dest_path: null  # path to overall nuc trx datasets
+max_length: ${.${.dataset_name}.max_length}
+d_output: ${.${.dataset_name}.classes} 
+use_padding: True
+padding_side: left
+add_eos: False
+batch_size: 256
+train_len: ${.${.dataset_name}.train_len}
+__l_max: ${.max_length}
+shuffle: true  # set this as default!
+metric: ${.${.dataset_name}.metric}
+
+# Updated dataset configurations based on new specifications
+enhancers:
+  train_len: 30000
+  classes: 2
+  max_length: 400
+  metric: mcc
+
+enhancers_types:
+  train_len: 30000
+  classes: 3
+  max_length: 400
+  metric: mcc
+
+promoter_all:
+  train_len: 30000
+  classes: 2
+  max_length: 300
+  metric: f1_binary
+
+promoter_no_tata:
+  train_len: 30000
+  classes: 2
+  max_length: 300
+  metric: f1_binary
+
+promoter_tata:
+  train_len: 5062
+  classes: 2
+  max_length: 300
+  metric: f1_binary
+
+splice_sites_acceptors:
+  train_len: 30000
+  classes: 2
+  max_length: 600
+  metric: f1_binary
+
+splice_sites_all:
+  train_len: 30000
+  classes: 3
+  max_length: 600
+  metric: accuracy
+
+splice_sites_donors:
+  train_len: 30000
+  classes: 2
+  max_length: 600
+  metric: f1_binary
+
+# New histone modification tasks with 1000bp sequences
+H2AFZ:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K27ac:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K27me3:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K36me3:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K4me1:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K4me2:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K4me3:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K9ac:
+  train_len: 23274
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H3K9me3:
+  train_len: 27438
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+H4K20me1:
+  train_len: 30000
+  classes: 2
+  max_length: 1000
+  metric: mcc
+
+# Legacy tasks (keeping for backward compatibility but commented out)
+# H3:
+#   train_len: 13468
+#   classes: 2
+#   max_length: 500
+#   metric: mcc
+# H3K14ac:
+#   train_len: 29743
+#   classes: 2
+#   max_length: 500
+#   metric: mcc
+# H3K79me3:
+#   train_len: 25953
+#   classes: 2
+#   max_length: 500
+#   metric: mcc
+# H4:
+#   train_len: 13140
+#   classes: 2
+#   max_length: 500
+#   metric: mcc
+# H4ac:
+#   train_len: 30685
+#   classes: 2
+#   max_length: 500
+#   metric: mcc
+
+# =============================================================================
+# CONFIGURATION SUMMARY
+# =============================================================================
+# 
+# 此配置文件定义了基因组序列分类任务的数据集参数，包含18个活跃任务：
+#
+# 任务分类：
+# 1. 启动子识别 (3个): 序列长度300bp, 2分类
+#    - promoter_all, promoter_no_tata, promoter_tata
+# 
+# 2. 增强子识别 (2个): 序列长度400bp
+#    - enhancers (2分类), enhancers_types (3分类)
+# 
+# 3. 剪切位点预测 (3个): 序列长度600bp
+#    - splice_sites_acceptors, splice_sites_donors (2分类)
+#    - splice_sites_all (3分类)
+# 
+# 4. 组蛋白修饰预测 (10个): 序列长度1000bp, 全部2分类
+#    - H2AFZ, H3K27ac, H3K27me3, H3K36me3, H3K4me1
+#    - H3K4me2, H3K4me3, H3K9ac, H3K9me3, H4K20me1
+#
+# 训练集大小：
+# - 标准: 30,000个序列 (大部分任务)
+# - 特殊: promoter_tata (5,062), H3K9ac (23,274), H3K9me3 (27,438)
+#
+# 评估指标：
+# - MCC (Matthews Correlation Coefficient): 大部分任务
+# - F1_binary: 启动子和剪切位点任务
+# - Accuracy: splice_sites_all任务
+#
+# 注意：配置文件已移除旧的H3, H4, H3K14ac等任务，以匹配最新数据集规
