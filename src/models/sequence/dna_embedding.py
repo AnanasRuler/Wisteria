@@ -18,8 +18,8 @@ except ImportError:
     ColumnParallelLinear = None
 
 
-from caduceus.configuration_caduceus import CaduceusConfig
-from caduceus.modeling_caduceus import Caduceus
+from wisteria.configuration_wisteria import WisteriaConfig
+from wisteria.modeling_wisteria import Wisteria
 from src.models.sequence.long_conv_lm import LMBackbone
 from src.models.sequence.long_conv_lm import _init_weights
 
@@ -153,12 +153,12 @@ class DNAEmbeddingModelMamba(DNAEmbeddingModel):
         return hidden_states, None
 
 
-class DNAEmbeddingModelCaduceus(DNAEmbeddingModel):
-    """Custom DNA Embedding Model that is compatible with Caduceus models."""
+class DNAEmbeddingModelWisteria(DNAEmbeddingModel):
+    """Custom DNA Embedding Model that is compatible with Wisteria models."""
 
     def __init__(
             self,
-            config: CaduceusConfig,
+            config: WisteriaConfig,
             device=None,
             dtype=None,
             conjoin_train=False,
@@ -168,7 +168,7 @@ class DNAEmbeddingModelCaduceus(DNAEmbeddingModel):
         self.config = config
         self.d_model = config.d_model  # for decoder
         factory_kwargs = {"device": device, "dtype": dtype}
-        self.caduceus = Caduceus(
+        self.wisteria = Wisteria(
             config=config,
             **factory_kwargs,
         )
@@ -177,9 +177,9 @@ class DNAEmbeddingModelCaduceus(DNAEmbeddingModel):
         self.conjoin_test = conjoin_test
 
     def forward(self, input_ids, position_ids=None, inference_params=None, state=None):  # state for the repo interface
-        """Caduceus backbone-specific forward pass that does not use `position_ids`."""
+        """Wisteria backbone-specific forward pass that does not use `position_ids`."""
         if self.config.rcps:  # Hidden states have 2 * d_model channels for RCPS
-            hidden_states = self.caduceus(input_ids, return_dict=False)
+            hidden_states = self.wisteria(input_ids, return_dict=False)
             num_chan = hidden_states.shape[-1]
             return torch.stack(
                 [hidden_states[..., :num_chan // 2], torch.flip(hidden_states[..., num_chan // 2:], dims=[1, 2])],
@@ -187,12 +187,12 @@ class DNAEmbeddingModelCaduceus(DNAEmbeddingModel):
             ), None
         if self.conjoin_train or (self.conjoin_test and not self.training):  # For conjoining / post-hoc conjoining
             assert input_ids.ndim == 3, "Input must be 3D tensor, where channels corresponds to forward and rc strands"
-            hidden_states = self.caduceus(input_ids[..., 0], return_dict=False)
-            hidden_states_rc = self.caduceus(input_ids[..., 1], return_dict=False)
+            hidden_states = self.wisteria(input_ids[..., 0], return_dict=False)
+            hidden_states_rc = self.wisteria(input_ids[..., 1], return_dict=False)
             # Stack along channel dimension (dim=-1)
             return torch.stack([hidden_states, hidden_states_rc], dim=-1), None
 
-        return self.caduceus(input_ids, return_dict=False), None
+        return self.wisteria(input_ids, return_dict=False), None
 
 
 def load_backbone(model, state_dict, freeze_backbone=False, ignore_head=True):

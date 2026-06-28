@@ -1,5 +1,5 @@
 """
-Fourier Position Embedding implementation for Caduceus models.
+Fourier Position Embedding implementation for Wisteria models.
 Based on the Fourier Position Embedding paper implementation.
 """
 

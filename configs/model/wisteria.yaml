@@ -1,7 +1,7 @@
 # Use open-source version of Mamba
-_name_: caduceus_lm
+_name_: wisteria_lm
 config:
-  _target_: caduceus.configuration_caduceus.CaduceusConfig
+  _target_: wisteria.configuration_wisteria.WisteriaConfig
   # From original MambaConfig
   d_model: 128
   d_intermediate: 256   #选择是否在块中添加mlp层
@@ -80,7 +80,7 @@ config:
     rescale_prenorm_residual: true
     n_residuals_per_layer: 1
 
-  # Caduceus-specific params
+  # Wisteria-specific params
   bidirectional: true
   bidirectional_strategy: "add"
   bidirectional_weight_tie: true

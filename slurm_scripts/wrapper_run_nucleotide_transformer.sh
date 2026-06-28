@@ -2,37 +2,37 @@
 
 # Choose one from below
 
-## Caduceus NO POST HOC
-#LOG_DIR="../watch_folder/nt_cv10_ep20/caduceus"
+## Wisteria NO POST HOC
+#LOG_DIR="../watch_folder/nt_cv10_ep20/wisteria"
 #CONFIG_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ph_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/model_config.json")
 #PRETRAINED_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ph_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/checkpoints/last.ckpt")
-#DISPLAY_NAME="caduceus_NO_PH"
-#MODEL="caduceus"
-#MODEL_NAME="dna_embedding_caduceus"
+#DISPLAY_NAME="wisteria_NO_PH"
+#MODEL="wisteria"
+#MODEL_NAME="dna_embedding_wisteria"
 #CONJOIN_TRAIN_DECODER="false"
 #CONJOIN_TEST="false"
 #RC_AUGS=( "true" )
 #LRS=( "1e-3" "2e-3")
 
-## Caduceus Post-Hoc
-#LOG_DIR="../watch_folder/nt_cv10_ep20/caduceus"
+## Wisteria Post-Hoc
+#LOG_DIR="../watch_folder/nt_cv10_ep20/wisteria"
 #CONFIG_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ph_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/model_config.json")
 #PRETRAINED_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ph_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/checkpoints/last.ckpt")
-#DISPLAY_NAME="caduceus_ph"
-#MODEL="caduceus"
-#MODEL_NAME="dna_embedding_caduceus"
+#DISPLAY_NAME="wisteria_ph"
+#MODEL="wisteria"
+#MODEL_NAME="dna_embedding_wisteria"
 #CONJOIN_TRAIN_DECODER="false"
 #CONJOIN_TEST="true"
 #RC_AUGS=( "false" )
 #LRS=( "1e-3" "2e-3" )
 
-# Caduceus Parameter Sharing
-LOG_DIR="../watch_folder/nt_cv10_ep20/caduceus"
-CONFIG_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ps_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/model_config.json")
-PRETRAINED_PATH=$(realpath "../outputs/pretrain/hg38/caduceus-ps_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/checkpoints/last.ckpt")
-DISPLAY_NAME="caduceus_ps"
-MODEL="caduceus"
-MODEL_NAME="dna_embedding_caduceus"
+# Wisteria Parameter Sharing
+LOG_DIR="../watch_folder/nt_cv10_ep20/wisteria"
+CONFIG_PATH=$(realpath "../outputs/pretrain/hg38/wisteria-ps_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/model_config.json")
+PRETRAINED_PATH=$(realpath "../outputs/pretrain/hg38/wisteria-ps_seqlen-1k_d_model-256_n_layer-4_lr-8e-3/checkpoints/last.ckpt")
+DISPLAY_NAME="wisteria_ps"
+MODEL="wisteria"
+MODEL_NAME="dna_embedding_wisteria"
 CONJOIN_TRAIN_DECODER="true"  # Use this in decoder to always combine forward and reverse complement channels
 CONJOIN_TEST="false"
 RC_AUGS=( "false" )

@@ -7,7 +7,7 @@ import os
 from functools import partial
 from os import path as osp
 from typing import Dict, Iterable, Optional
-import caduceus
+import wisteria
 import enformer_pytorch
 import fsspec
 import torch

@@ -4,16 +4,16 @@ import pandas as pd
 from collections import defaultdict
 
 # 导入您的模型和配置类
-# 假设这些文件位于 caduceus 目录中
-from caduceus.modeling_caduceus import CaduceusForMaskedLM
-from caduceus.configuration_caduceus import CaduceusConfig
+# 假设这些文件位于 wisteria 目录中
+from wisteria.modeling_wisteria import WisteriaForMaskedLM
+from wisteria.configuration_wisteria import WisteriaConfig
 
-def benchmark_model(config: CaduceusConfig, seq_len: int, batch_size: int, device: torch.device, warmup_steps: int = 10, benchmark_steps: int = 20):
+def benchmark_model(config: WisteriaConfig, seq_len: int, batch_size: int, device: torch.device, warmup_steps: int = 10, benchmark_steps: int = 20):
     """
     对给定配置的模型进行基准测试。
 
     Args:
-        config (CaduceusConfig): 模型配置。
+        config (WisteriaConfig): 模型配置。
         seq_len (int): 输入序列的长度。
         batch_size (int): 批次大小。
         device (torch.device): 运行模型的设备 (e.g., 'cuda:0')。
@@ -27,7 +27,7 @@ def benchmark_model(config: CaduceusConfig, seq_len: int, batch_size: int, devic
     dtype = torch.float16
 
     # 设置为评估模式并禁用梯度计算, 并转换为指定数据类型
-    model = CaduceusForMaskedLM(config).to(device=device, dtype=dtype).eval()
+    model = WisteriaForMaskedLM(config).to(device=device, dtype=dtype).eval()
     print(model)
     
     # 创建虚拟输入数据
@@ -107,7 +107,7 @@ def main():
                 "head_dim": D_MODEL // 8, # 确保 head_dim * num_heads = d_model
                 "use_flash_attn": torch.cuda.is_available() # 如果可用，自动使用Flash Attention# 如果可用，自动使用Flash Attention
             }
-            config_with_attn = CaduceusConfig(
+            config_with_attn = WisteriaConfig(
                 d_model=D_MODEL,
                 n_modules=1,
                 layers_per_module=N_LAYER,
@@ -135,10 +135,10 @@ def main():
             print(f"  An unknown error occurred: {e}")
 
 
-        # --- 配置 2: 无注意力层 (Caduceus) ---
-        print("Configuration 2: Caduceus...")
+        # --- 配置 2: 无注意力层 (基线) ---
+        print("Configuration 2: Baseline...")
         try:
-            config_no_attn = CaduceusConfig(
+            config_no_attn = WisteriaConfig(
                 d_model=D_MODEL,
                 n_modules=1,
                 layers_per_module=N_LAYER,
@@ -148,19 +148,19 @@ def main():
             )
             throughput, memory = benchmark_model(config_no_attn, seq_len, BATCH_SIZE, device)
             results["Sequence Length"].append(seq_len)
-            results["Model"].append("Caduceus")
+            results["Model"].append("Baseline")
             results["Throughput (token/s)"].append(f"{throughput:.2f}")
             results["Peak Memory (MB)"].append(f"{memory:.2f}")
             print(f"  Done. Throughput: {throughput:.2f} token/s, Peak Memory: {memory:.2f} MB")
         except torch.cuda.OutOfMemoryError:
             results["Sequence Length"].append(seq_len)
-            results["Model"].append("Caduceus")
+            results["Model"].append("Baseline")
             results["Throughput (token/s)"].append("OOM")
             results["Peak Memory (MB)"].append("OOM")
             print("  CUDA out of memory error (OOM).")
         except Exception as e:
             results["Sequence Length"].append(seq_len)
-            results["Model"].append("Caduceus")
+            results["Model"].append("Baseline")
             results["Throughput (token/s)"].append(f"Error: {type(e).__name__}")
             results["Peak Memory (MB)"].append(f"Error: {type(e).__name__}")
             print(f"  An unknown error occurred: {e}")
@@ -171,7 +171,7 @@ def main():
         try:
             # 创建一个包含所有层索引的列表，使模型完全由注意力构成
             all_attn_layers = list(range(N_LAYER))
-            config_all_attn = CaduceusConfig(
+            config_all_attn = WisteriaConfig(
                 d_model=D_MODEL,
                 n_modules=1,
                 layers_per_module=N_LAYER,

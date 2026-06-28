@@ -1,4 +1,4 @@
-"""Caduceus model for Hugging Face."""
+"""Wisteria model for Hugging Face."""
 
 import copy
 import inspect
@@ -38,7 +38,7 @@ except ImportError:
     except ImportError:
         RMSNorm, layer_norm_fn, rms_norm_fn = None, None, None
 
-from .configuration_caduceus import CaduceusConfig
+from .configuration_wisteria import WisteriaConfig
 from .modeling_rcps import RCPSAddNormWrapper, RCPSEmbedding, RCPSLMHead, RCPSMambaBlock
 
 
@@ -76,7 +76,7 @@ def create_block(
     fourier_norm=False,
     fourier_ignore_zero=True,
 ):
-    """Create Caduceus block.
+    """Create Wisteria block.
 
     Adapted from: https://github.com/state-spaces/mamba/blob/main/mamba_ssm/models/mixer_seq_simple.py
     """
@@ -226,10 +226,10 @@ class BiMambaWrapper(nn.Module):
         return out
 
 
-class CaduceusEmbeddings(nn.Module):
+class WisteriaEmbeddings(nn.Module):
     def __init__(
         self,
-        config: CaduceusConfig,
+        config: WisteriaConfig,
         device=None,
         dtype=None,
     ):
@@ -254,14 +254,14 @@ class CaduceusEmbeddings(nn.Module):
         return self.word_embeddings(input_ids)
 
 
-class CaduceusModule(nn.Module):
+class WisteriaModule(nn.Module):
     """
-    一个Caduceus模块，包含指定数量的层（默认8层）。
+    一个Wisteria模块，包含指定数量的层（默认8层）。
     前conv_layers_per_module层使用膨胀卷积，attn_layer_in_module层使用注意力机制。
     """
     def __init__(
         self,
-        config: CaduceusConfig,
+        config: WisteriaConfig,
         module_idx: int,
         device=None,
         dtype=None,
@@ -327,13 +327,13 @@ class CaduceusModule(nn.Module):
         return hidden_states, residual
 
 
-class CaduceusMixerModel(nn.Module):
+class WisteriaMixerModel(nn.Module):
     """
-    模块化的Caduceus混合器模型，支持多个模块的组合
+    模块化的Wisteria混合器模型，支持多个模块的组合
     """
     def __init__(
         self,
-        config: CaduceusConfig,
+        config: WisteriaConfig,
         device=None,
         dtype=None,
     ):
@@ -345,12 +345,12 @@ class CaduceusMixerModel(nn.Module):
         self.fused_add_norm = config.fused_add_norm
         
         # 添加 embeddings 层
-        self.embeddings = CaduceusEmbeddings(config, **factory_kwargs)
+        self.embeddings = WisteriaEmbeddings(config, **factory_kwargs)
         
         # 创建模块列表
         self.modules_list = nn.ModuleList()
         for i in range(config.n_modules):
-            module = CaduceusModule(config, i, **factory_kwargs)
+            module = WisteriaModule(config, i, **factory_kwargs)
             self.modules_list.append(module)
         
         # 为了向后兼容，也创建一个 layers 属性
@@ -417,11 +417,11 @@ class CaduceusMixerModel(nn.Module):
             for i, module in enumerate(self.modules_list)
         }
 
-class CaduceusPreTrainedModel(PreTrainedModel):
-    """PreTrainedModel wrapper for Caduceus backbone."""
+class WisteriaPreTrainedModel(PreTrainedModel):
+    """PreTrainedModel wrapper for Wisteria backbone."""
 
-    config_class = CaduceusConfig
-    base_model_prefix = "caduceus"
+    config_class = WisteriaConfig
+    base_model_prefix = "wisteria"
     supports_gradient_checkpointing = False
     _no_split_modules = ["BiMambaWrapper"]
 
@@ -469,10 +469,10 @@ class CaduceusPreTrainedModel(PreTrainedModel):
                         p /= math.sqrt(n_residuals_per_layer * n_layer)
 
 
-class Caduceus(CaduceusPreTrainedModel):
-    """Caduceus model that can be instantiated using HF patterns."""
+class Wisteria(WisteriaPreTrainedModel):
+    """Wisteria model that can be instantiated using HF patterns."""
 
-    def __init__(self, config: CaduceusConfig, device=None, dtype=None, **kwargs):
+    def __init__(self, config: WisteriaConfig, device=None, dtype=None, **kwargs):
         super().__init__(config)
 
         if config.rcps:
@@ -493,7 +493,7 @@ class Caduceus(CaduceusPreTrainedModel):
 
         self.config = config
         factory_kwargs = {"device": device, "dtype": dtype}
-        self.backbone = CaduceusMixerModel(config, **factory_kwargs, **kwargs)
+        self.backbone = WisteriaMixerModel(config, **factory_kwargs, **kwargs)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -574,24 +574,24 @@ class Caduceus(CaduceusPreTrainedModel):
             return hidden_states
 
 
-class CaduceusForMaskedLM(CaduceusPreTrainedModel):
-    """HF-compatible Caduceus model for masked language modeling."""
+class WisteriaForMaskedLM(WisteriaPreTrainedModel):
+    """HF-compatible Wisteria model for masked language modeling."""
 
-    def __init__(self, config: CaduceusConfig, device=None, dtype=None, **kwargs):
+    def __init__(self, config: WisteriaConfig, device=None, dtype=None, **kwargs):
         super().__init__(config, **kwargs)
         factory_kwargs = {"device": device, "dtype": dtype}
-        self.caduceus = Caduceus(config, **factory_kwargs, **kwargs)
+        self.wisteria = Wisteria(config, **factory_kwargs, **kwargs)
         if config.rcps:
             self.lm_head = RCPSLMHead(
-                complement_map=self.config.complement_map,  # Use caduceus config as it might have been updated
-                vocab_size=self.config.vocab_size,  # Use caduceus config as it might have been updated
+                complement_map=self.config.complement_map,  # Use wisteria config as it might have been updated
+                vocab_size=self.config.vocab_size,  # Use wisteria config as it might have been updated
                 true_dim=config.d_model,
                 dtype=dtype,
             )
         else:
             self.lm_head = nn.Linear(
                 config.d_model,
-                self.config.vocab_size,  # Use caduceus config as it might have been updated
+                self.config.vocab_size,  # Use wisteria config as it might have been updated
                 bias=False,
                 **factory_kwargs,
             )
@@ -600,14 +600,14 @@ class CaduceusForMaskedLM(CaduceusPreTrainedModel):
         self.post_init()
 
     def get_input_embeddings(self):
-        return self.caduceus.backbone.embeddings.word_embeddings
+        return self.wisteria.backbone.embeddings.word_embeddings
 
     def set_input_embeddings(self, value):
         if self.config.rcps:
             raise NotImplementedError(
                 "Setting input embeddings for RCPS LM is not supported."
             )
-        self.caduceus.backbone.embeddings.word_embeddings = value
+        self.wisteria.backbone.embeddings.word_embeddings = value
 
     def get_output_embeddings(self):
         return self.lm_head
@@ -621,7 +621,7 @@ class CaduceusForMaskedLM(CaduceusPreTrainedModel):
         self.lm_head = new_embeddings
 
     def maybe_weight_tie_mamba(self):
-        self.caduceus.maybe_weight_tie_mamba()
+        self.wisteria.maybe_weight_tie_mamba()
 
     def tie_weights(self):
         """Tie weights, accounting for RCPS."""
@@ -633,11 +633,11 @@ class CaduceusForMaskedLM(CaduceusPreTrainedModel):
 
     def get_decoder(self):
         """Get decoder (backbone) for the model."""
-        return self.caduceus
+        return self.wisteria
 
     def set_decoder(self, decoder):
         """Set decoder (backbone) for the model."""
-        self.caduceus = decoder
+        self.wisteria = decoder
 
     def forward(
         self,
@@ -660,7 +660,7 @@ class CaduceusForMaskedLM(CaduceusPreTrainedModel):
         )
 
         # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
-        outputs = self.caduceus(
+        outputs = self.wisteria(
             input_ids=input_ids,
             inputs_embeds=inputs_embeds,
             output_hidden_states=output_hidden_states,
@@ -693,10 +693,10 @@ class CaduceusForMaskedLM(CaduceusPreTrainedModel):
         )
 
 
-class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
+class WisteriaForSequenceClassification(WisteriaPreTrainedModel):
     def __init__(
         self,
-        config: CaduceusConfig,
+        config: WisteriaConfig,
         pooling_strategy: str = "mean",
         conjoin_train: bool = False,
         conjoin_eval: bool = False,
@@ -712,7 +712,7 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
         self.pooling_strategy = pooling_strategy
         factory_kwargs = {"device": device, "dtype": dtype}
         self.num_labels = kwargs.get("num_labels", config.num_labels)
-        self.caduceus = Caduceus(config, **factory_kwargs, **kwargs)
+        self.wisteria = Wisteria(config, **factory_kwargs, **kwargs)
         self.score = nn.Linear(config.d_model, self.num_labels, bias=False)
 
         self.conjoin_train = conjoin_train
@@ -731,14 +731,14 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
         self.score.weight.data.normal_(std=initializer_range)
 
     def get_input_embeddings(self):
-        return self.caduceus.backbone.embeddings.word_embeddings
+        return self.wisteria.backbone.embeddings.word_embeddings
 
     def set_input_embeddings(self, value):
         if self.config.rcps:
             raise NotImplementedError(
                 "Setting input embeddings for RCPS LM is not supported."
             )
-        self.caduceus.backbone.embeddings.word_embeddings = value
+        self.wisteria.backbone.embeddings.word_embeddings = value
 
     def pool_hidden_states(self, hidden_states, sequence_length_dim=1):
         """Pools hidden states along sequence length dimension."""
@@ -762,7 +762,7 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
             return hidden_states.moveaxis(hidden_states, sequence_length_dim, 0)[0, ...]
 
     def maybe_weight_tie_mamba(self):
-        self.caduceus.maybe_weight_tie_mamba()
+        self.wisteria.maybe_weight_tie_mamba()
 
     def tie_weights(self):
         self.maybe_weight_tie_mamba()
@@ -788,7 +788,7 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
 
         # Get hidden representations from the backbone
         if self.config.rcps:  # Hidden states have 2 * d_model channels for RCPS
-            transformer_outputs = self.caduceus(
+            transformer_outputs = self.wisteria(
                 input_ids,
                 inputs_embeds=inputs_embeds,
                 output_hidden_states=output_hidden_states,
@@ -810,13 +810,13 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
             assert input_ids.ndim == 3, (
                 "`input_ids` must be 3D tensor: channels corresponds to forward and rc strands."
             )
-            transformer_outputs = self.caduceus(
+            transformer_outputs = self.wisteria(
                 input_ids[..., 0],
                 inputs_embeds=None,
                 output_hidden_states=output_hidden_states,
                 return_dict=return_dict,
             )
-            transformer_outputs_rc = self.caduceus(
+            transformer_outputs_rc = self.wisteria(
                 input_ids[..., 1],
                 inputs_embeds=None,
                 output_hidden_states=output_hidden_states,
@@ -827,7 +827,7 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
                 [transformer_outputs[0], transformer_outputs_rc[0]], dim=-1
             )
         else:
-            transformer_outputs = self.caduceus(
+            transformer_outputs = self.wisteria(
                 input_ids,
                 inputs_embeds=None,
                 output_hidden_states=output_hidden_states,
@@ -882,6 +882,6 @@ class CaduceusForSequenceClassification(CaduceusPreTrainedModel):
         )
 
 # 删除或注释掉这个类，因为我们现在使用新的模块化版本
-# class CaduceusMixerModelLegacy(nn.Module):
-#     """Legacy Caduceus mixer model."""
+# class WisteriaMixerModelLegacy(nn.Module):
+#     """Legacy Wisteria mixer model."""
 #     ...

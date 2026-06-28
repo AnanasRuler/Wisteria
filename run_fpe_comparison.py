@@ -31,7 +31,7 @@ CONV_LAYERS_PER_MODULE = 0  # 不使用卷积
 # ATTN_LAYER_IN_MODULE = 2 
 ATTN_LAYER_IDX = [0, 1, 2] # 动态生成索引列表
 
-# 4. 注意力配置 (参考 run_pretrain_caduceus.sh)
+# 4. 注意力配置 (参考 run_pretrain_wisteria.sh)
 ATTN_NUM_HEADS = 4
 ATTN_HEAD_DIM = D_MODEL // ATTN_NUM_HEADS
 ATTN_MLP_DIM = 256 # 通常是 d_model 的倍数
@@ -41,7 +41,7 @@ USE_FOURIER_POS_EMB = True # 这是一个模板值，会在循环中被覆盖
 # FOURIER_MAX_SEQ_LEN = 8192 # 固定为预训练值
 FOURIER_LEARNABLE = False    # 设置为可学习
 
-# 6. 新增：更多可调整的 FoPE 参数 (参考 caduceus.yaml)
+# 6. 新增：更多可调整的 FoPE 参数 (参考 wisteria.yaml)
 FOURIER_SEPARATE_BASIS = True
 FOURIER_SEPARATE_HEAD = True
 FOURIER_NORM = False
@@ -51,7 +51,7 @@ FOURIER_INIT_NORM_GAIN = 0.3
 # 使用 'null' 字符串来表示 yaml 中的 null 值，如果想指定维度，可设为如 32, 64 等
 FOURIER_DIM = "null" 
 
-# 7. 其他关键配置 (参考 run_pretrain_caduceus.sh)
+# 7. 其他关键配置 (参考 run_pretrain_wisteria.sh)
 RC_AUG = True
 BIDIRECTIONAL = True
 BIDIRECTIONAL_STRATEGY = "add"
@@ -102,7 +102,7 @@ def run_experiment(seq_len, use_fpe):
         # 数据加载器配置
         f"loader.num_workers={NUM_WORKERS}",
         # 模型配置
-        f"model=caduceus",
+        f"model=wisteria",
         f"model.config.d_model={D_MODEL}",
         f"model.config.d_intermediate={D_INTERMEDIATE}",
         f"model.config.n_modules={N_MODULES}",

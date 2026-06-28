@@ -25,7 +25,7 @@ from src.dataloaders import SequenceDataset  # TODO make registry
 from src.tasks import decoders, encoders, tasks
 from src.utils import registry
 from src.utils.optim_groups import add_optimizer_hooks
-from caduceus.mha import MHA
+from wisteria.mha import MHA
 
 log = src.utils.train.get_logger(__name__)
 
@@ -205,19 +205,19 @@ def print_model_info(model, config=None):
             module_params = sum(p.numel() for p in module.parameters())
             print(f"{name}: {module_params:,} parameters")
     
-    # 如果是模块化的Caduceus模型，尝试打印模块信息
+    # 如果是模块化的Wisteria模型，尝试打印模块信息
     try:
         # 检查是否有我们新定义的模块结构
         if hasattr(model, 'model') and hasattr(model.model, 'modules_list'):
-            print(f"\nCaduceus Modules (New Structure):")
-            for i, caduceus_module in enumerate(model.model.modules_list):
-                if hasattr(caduceus_module, 'parameters'):
-                    module_params = sum(p.numel() for p in caduceus_module.parameters())
+            print(f"\nWisteria Modules (New Structure):")
+            for i, wisteria_module in enumerate(model.model.modules_list):
+                if hasattr(wisteria_module, 'parameters'):
+                    module_params = sum(p.numel() for p in wisteria_module.parameters())
                     print(f"  Module {i}: {module_params:,} parameters")
                     
                     # 打印模块内的层信息
-                    if hasattr(caduceus_module, 'layers'):
-                        for j, layer in enumerate(caduceus_module.layers):
+                    if hasattr(wisteria_module, 'layers'):
+                        for j, layer in enumerate(wisteria_module.layers):
                             layer_params = sum(p.numel() for p in layer.parameters())
                             layer_type = type(layer).__name__
                             print(f"    Layer {j} ({layer_type}): {layer_params:,} parameters")
@@ -326,8 +326,8 @@ class SequenceLightningModule(pl.LightningModule):
             except ImportError:
                 if self.hparams.model.get("fused_dropout_add_ln", None) is not None:
                     self.hparams.model.update({"fused_dropout_add_ln": False})
-        # TODO: Hacky way to get complement_map for Caduceus models; need to find a more elegant implementation
-        if "caduceus" in self.hparams.model.get("_name_"):
+        # TODO: Hacky way to get complement_map for Wisteria models; need to find a more elegant implementation
+        if "wisteria" in self.hparams.model.get("_name_"):
             OmegaConf.update(
                 self.hparams.model.config,
                 "complement_map",

@@ -7,7 +7,7 @@
 ##SBATCH --cpus-per-task=4                  # Number of CPU cores per task
 #SBATCH -N 1                                # Number of nodes
 #SBATCH --requeue                           # Requeue job if it fails
-#SBATCH --job-name=caduceus_ps              # Job name
+#SBATCH --job-name=wisteria_ps              # Job name
 #SBATCH --output=../watch_folder/%x_%j.log  # Log file
 #SBATCH --open-mode=append                  # Do not overwrite logs
 
@@ -31,7 +31,7 @@ RC_AUG="false"
 
 BATCH_SIZE=$(( 1048576 / SEQLEN ))
 SEQLEN_DIS="$(echo "scale=0; ${SEQLEN} / 1000" | bc)k"
-WANDB_NAME="caduceus-ps_seqlen-${SEQLEN_DIS}_d_model-${D_MODEL}_n_layer-${N_LAYER}_lr-${LR}"
+WANDB_NAME="wisteria-ps_seqlen-${SEQLEN_DIS}_d_model-${D_MODEL}_n_layer-${N_LAYER}_lr-${LR}"
 HYDRA_RUN_DIR="./outputs/pretrain/hg38/${WANDB_NAME}"
 
 mkdir -p "${HYDRA_RUN_DIR}"
@@ -43,7 +43,7 @@ srun python -m train \
   dataset.mlm=true \
   dataset.mlm_probability=0.15 \
   dataset.rc_aug="${RC_AUG}" \
-  model="caduceus" \
+  model="wisteria" \
   model.config.d_model=${D_MODEL} \
   model.config.n_layer=${N_LAYER} \
   model.config.bidirectional=true \

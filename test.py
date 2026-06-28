@@ -2,10 +2,10 @@ import torch
 from transformers import AutoConfig, AutoModelForMaskedLM, AutoModel
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
-from caduceus.modeling_caduceus import CaduceusForMaskedLM
-from caduceus.configuration_caduceus import CaduceusConfig
-from caduceus.tokenization_caduceus import CaduceusTokenizer
-import caduceus
+from wisteria.modeling_wisteria import WisteriaForMaskedLM
+from wisteria.configuration_wisteria import WisteriaConfig
+from wisteria.tokenization_wisteria import WisteriaTokenizer
+import wisteria
 import json
 
 # 修改为 GatedMambav1_final 模型的路径
@@ -22,19 +22,19 @@ print(f"从配置文件中读取到的最大长度: {max_length}")
 # 处理模型配置
 hf_config = OmegaConf.to_container(model_config["config"], resolve=True)
 hf_config.pop("_target_", None)
-hf_config = CaduceusConfig(**hf_config)
+hf_config = WisteriaConfig(**hf_config)
 
 # 保存为 HF 格式，使用新的模型名称
 output_path = "./hf_model/MHA_mamba_1_3_MSC-0-nomlp"
 hf_config.save_pretrained(output_path) 
 
 # 使用从配置文件中读取的最大长度创建 tokenizer
-tokenizer = CaduceusTokenizer(max_length)
+tokenizer = WisteriaTokenizer(max_length)
 tokenizer.save_pretrained(output_path)
 
 print(f"配置类型: {type(hf_config)}")
 print(f"Tokenizer 最大长度设置为: {max_length}")
-model = CaduceusForMaskedLM(hf_config)
+model = WisteriaForMaskedLM(hf_config)
 
 # 加载 PL 的 .ckpt 文件
 ckpt = torch.load(f"{model_path}/checkpoints/last.ckpt")

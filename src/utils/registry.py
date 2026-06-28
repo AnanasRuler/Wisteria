@@ -26,12 +26,12 @@ model = {
     # Pre-training LM head models
     "hyena_lm": "src.models.sequence.long_conv_lm.ConvLMHeadModel",
     "mamba_lm": "mamba_ssm.models.mixer_seq_simple.MambaLMHeadModel",
-    "caduceus_lm": "caduceus.modeling_caduceus.CaduceusForMaskedLM",
+    "wisteria_lm": "wisteria.modeling_wisteria.WisteriaForMaskedLM",
 
     # Downstream task embedding backbones
     "dna_embedding": "src.models.sequence.dna_embedding.DNAEmbeddingModel",
     "dna_embedding_mamba": "src.models.sequence.dna_embedding.DNAEmbeddingModelMamba",
-    "dna_embedding_caduceus": "src.models.sequence.dna_embedding.DNAEmbeddingModelCaduceus",
+    "dna_embedding_wisteria": "src.models.sequence.dna_embedding.DNAEmbeddingModelWisteria",
 
     # Baseline for genomics benchmark
     "genomics_benchmark_cnn": "src.models.baseline.genomics_benchmark_cnn.GenomicsBenchmarkCNN",

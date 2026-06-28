@@ -13,7 +13,7 @@ import torch
 from datasets import Dataset
 from torch.utils.data.dataloader import DataLoader
 
-from caduceus.tokenization_caduceus import CaduceusTokenizer
+from wisteria.tokenization_wisteria import WisteriaTokenizer
 import src.utils.train
 from src.dataloaders.base import SequenceDataset, default_data_path
 from src.dataloaders.datasets.genomic_bench_dataset import GenomicBenchmarkDataset
@@ -105,7 +105,7 @@ class HG38(SequenceDataset):
             #     model_max_length=self.max_length,
             #     add_special_tokens=False,
             # )
-            self.tokenizer = CaduceusTokenizer(
+            self.tokenizer = WisteriaTokenizer(
                 model_max_length=self.max_length,
                 add_special_tokens=False
             )

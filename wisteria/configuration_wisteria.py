@@ -1,4 +1,4 @@
-"""Caduceus config            n_layer: int = 64,
+"""Wisteria config            n_layer: int = 64,
             
             # Module-based configuration
             n_modules: int = 8,                    #模块数量
@@ -35,9 +35,9 @@ from typing import Optional, Union
 from transformers import PretrainedConfig
 
 
-class CaduceusConfig(PretrainedConfig):
+class WisteriaConfig(PretrainedConfig):
     """Config that extends the original MambaConfig with params relevant to bi-directionality and RC equivariance."""
-    model_type = "caduceus"
+    model_type = "wisteria"
 
     def __init__(
             self,
@@ -83,7 +83,7 @@ class CaduceusConfig(PretrainedConfig):
             # Used in init_weights
             initializer_cfg: Optional[dict] = None,
 
-            # Caduceus-specific params
+            # Wisteria-specific params
             bidirectional: bool = True,
             bidirectional_strategy: Union[str, None] = "add",
             bidirectional_weight_tie: bool = True,

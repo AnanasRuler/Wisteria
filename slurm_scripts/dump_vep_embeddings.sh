@@ -49,7 +49,7 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8  # Needed for setting deterministic funct
 #name="hyena_downstream-seqlen=131k"
 #rcps_flag="no-rcps"
 
-## Caduceus-Ph
+## Wisteria-Ph
 #seq_len=131072
 #bp_per_token=1
 #embed_dump_batch_size=1
@@ -57,7 +57,7 @@ export CUBLAS_WORKSPACE_CONFIG=:4096:8  # Needed for setting deterministic funct
 #name="caduceus-ph_downstream-seqlen=131k"
 #rcps_flag="no-rcps"
 
-## Caduceus-PS
+## Wisteria-PS
 #seq_len=131072
 #bp_per_token=1
 #embed_dump_batch_size=1

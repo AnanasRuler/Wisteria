@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Sequence, Tuple
 from transformers import PreTrainedTokenizer
 
 
-class CaduceusTokenizer(PreTrainedTokenizer):
+class WisteriaTokenizer(PreTrainedTokenizer):
     model_input_names = ["input_ids"]
 
     def __init__(self,

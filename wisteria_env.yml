@@ -1,4 +1,4 @@
-name: caduceus_env
+name: wisteria_env
 channels:
   - pytorch
   - anaconda

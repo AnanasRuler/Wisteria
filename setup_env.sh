@@ -8,10 +8,10 @@
 # shellcheck source=${HOME}/.bashrc disable=SC1091
 source "${CONDA_SHELL}"
 if [ -z "${CONDA_PREFIX}" ]; then
-    conda activate caduceus
- elif [[ "${CONDA_PREFIX}" != *"/caduceus" ]]; then
+    conda activate wisteria
+ elif [[ "${CONDA_PREFIX}" != *"/wisteria" ]]; then
   conda deactivate
-  conda activate caduceus
+  conda activate wisteria
 fi
 
 # Add root directory to PYTHONPATH to enable module imports
